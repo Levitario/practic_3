@@ -1,0 +1,125 @@
+import json
+from functools import reduce
+
+#1 Загрузка списка стран из файла countries.json
+with open('countries.json', 'r') as file:
+    countries = json.load(file)
+
+#2 Преобразование названий стран в прописные
+upper_countries = list(map(lambda x: x.upper(), countries))
+
+#3 Фильтрация стран, содержащие 'land'
+land_countries = list(filter(lambda x: 'LAND' in x, upper_countries))
+
+#4 Фильтрация стран, содержащие ровно шесть символов
+six_char_countries = list(filter(lambda x: len(x) == 6, upper_countries))
+
+#5 Фильтрация стран, содержащие шесть и более букв
+six_or_more_char_countries = list(filter(lambda x: len(x) >= 6, upper_countries))
+
+#6 Фильтрация стран, начинающихся с буквы 'E'
+not_e_countries = list(filter(lambda x: not x.startswith('E'), upper_countries))
+
+#7 Формирования предложения о странах Северной Европы
+nordic_countries = ["FINLAND", "SWEDEN", "DENMARK", "NORWAY", "ICELAND"]
+sentence = reduce(lambda x, y: x + ', ' + y, nordic_countries) + ' are countries in Northern Europe.'
+
+#8 Решение задач, объединяя две или более функций высшего порядка
+land_and_six_char_countries = list(filter(lambda x: 'LAND' in x and len(x) == 6, upper_countries))
+
+#9 Каррирование и замыкания для функции categorize_countries()
+def categorize_countries(pattern):
+    def inner(countries_list):
+        return list(filter(lambda x: pattern in x, countries_list))
+    return inner
+
+# Пример использования функции categorize_countries
+categorize_with_land = categorize_countries('LAND')
+countries_with_land = categorize_with_land(upper_countries)
+
+#10 Работа с файлом countries-data.json
+with open('countries-data.json', 'r') as file:
+    countries_data = json.load(file)
+
+#10.1. Сортировка стран
+#По названию
+sorted_by_name = sorted(countries_data, key=lambda x: x['name'])
+
+#По столице
+#Нахождение исключений (если у страны нет или не указана столица)
+filtered_countries_data = [country for country in countries_data if country['capital']]
+
+#Сортировка стран по столицам
+sorted_by_capital_filtered = sorted(filtered_countries_data, key=lambda x: x['capital'])
+
+#По численности населения
+sorted_by_population = sorted(countries_data, key=lambda x: x['population'], reverse=True)
+
+#10.2 Выявление наиболее распространенных языков
+languages_count = {}
+for country in countries_data:
+    for language in country['languages']:
+        if language in languages_count:
+            languages_count[language] += 1
+        else:
+            languages_count[language] = 1
+
+#Сортировка и выбор 10 наиболее распространенных языков
+top_languages = sorted(languages_count.items(), key=lambda x: x[1], reverse=True)[:10]
+
+#10.3. Выявление 10 наиболее населенных стран
+top_population_countries = sorted(countries_data, key=lambda x: x['population'], reverse=True)[:10]
+
+# Вспомогательная функция для вывода списков
+def print_sample_list(name, lst, num_samples=5):
+    print(f"{name}:")
+    for item in lst[:num_samples]:
+        print(f"  - {item}")
+    print("  ...")
+    print()
+
+#1 Преобразование названий стран в верхний регистр
+print_sample_list("Преобразование названий стран в верхний регистр", upper_countries)
+
+#2 Фильтрация стран, содержащих 'LAND'
+print_sample_list("Страны, содержащие 'LAND'", land_countries)
+
+#3 Фильтрация стран с названиями из ровно шести символов
+print_sample_list("Страны с названиями из ровно шести символов", six_char_countries)
+
+#4 Фильтрация стран с названиями из шести и более символов
+print_sample_list("Страны с названиями из шести и более символов", six_or_more_char_countries)
+
+#5 Фильтрация стран, названия которых не начинаются на 'E'
+print_sample_list("Страны, не начинающиеся на 'E'", not_e_countries)
+
+#6 Сформированное предложение о странах Северной Европы
+print(f"Сформированное предложение о странах Северной Европы:\n  - {sentence}\n")
+
+#7 Фильтрация стран, содержащих 'LAND' и с названиями из шести символов
+print_sample_list("Страны, содержащие 'LAND' и с названиями из шести символов", land_and_six_char_countries)
+
+#8 Функция categorize_countries() для фильтрации стран по общему шаблону (например, 'LAND')
+print_sample_list("Функция categorize_countries() (пример с 'LAND')", countries_with_land)
+
+#9 Сортировка стран из файла countries-data.json
+# По названию
+print_sample_list("Сортировка стран по названию", [c['name'] for c in sorted_by_name])
+
+#По столице
+print_sample_list("Сортировка стран по столице", [c['capital'] for c in sorted_by_capital_filtered])
+
+#По численности населения
+print_sample_list("Сортировка стран по численности населения", [f"{c['name']}: {c['population']}" for c in sorted_by_population])
+
+#10 Наиболее распространённые языки
+print("Наиболее распространённые языки:")
+for lang, count in top_languages:
+    print(f"  - {lang}: {count}")
+print()
+
+#10.1: 10 наиболее населенных стран
+print("10 наиболее населенных стран:")
+for country in top_population_countries:
+    print(f"  - {country['name']}: {country['population']}")
+print()
